@@ -16,20 +16,18 @@ def main():
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
 
-
+############################## Handlers for workout guide function #######################################
     updater.dispatcher.add_handler(CommandHandler('workout', workout_command))
     updater.dispatcher.add_handler(CallbackQueryHandler(main_menu, pattern='main'))
-    updater.dispatcher.add_handler(CallbackQueryHandler(advanced_menu, pattern='advanced'))
-    updater.dispatcher.add_handler(CallbackQueryHandler(intermediate_menu, pattern='intermediate'))
-    updater.dispatcher.add_handler(CallbackQueryHandler(beginner_menu, pattern='beginner'))
-    
-    
-    
-    
+    updater.dispatcher.add_handler(CallbackQueryHandler(advanced, pattern='advanced'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(intermediate, pattern='intermediate'))
+    updater.dispatcher.add_handler(CallbackQueryHandler(beginner, pattern='beginner'))
+##########################################################################################################      
     updater.dispatcher.add_error_handler(error)
     
     updater.start_polling()
     updater.idle()
+##############################Workout Guide Function #####################################################
 def workout_command(bot, update):
     bot.message.reply_text(main_menu_message(),
                          reply_markup=main_menu_keyboard())
@@ -38,14 +36,14 @@ def main_menu(bot, update):
     bot.callback_query.message.edit_text(main_menu_message(),
                           reply_markup=main_menu_keyboard())
 
-def advanced_menu(bot, update):
+def advanced(bot, update):
     bot.callback_query.message.edit_text(advanced_message(),
                           reply_markup=None)
 
-def intermediate_menu(bot, update):
+def intermediate(bot, update):
     bot.callback_query.message.edit_text(intermediate_message(),
                           reply_markup=None)
-def beginner_menu(bot, update):
+def beginner(bot, update):
     bot.callback_query.message.edit_text(beginner_message(),
                           reply_markup=None)
 def main_menu_message():
@@ -85,17 +83,12 @@ Instructions:\n\
 -Perfrom each move at maximum effort for 30 seconds and then rest for 30 seconds\n\
 -Do 3 rounds, resting for 2 minute in between rounds.'
     
-    
-
-
 def main_menu_keyboard():
   keyboard = [[InlineKeyboardButton('Advanced', callback_data='advanced')],
               [InlineKeyboardButton('Intermediate', callback_data='intermediate')],
               [InlineKeyboardButton('Beginner', callback_data='beginner')],]
   return InlineKeyboardMarkup(keyboard)
-
-
-
+###########################################################################################################  
 def error(update, context):
     print(f'Update {update} caused error {context.error}')
 

@@ -4,8 +4,11 @@ import configparser
 import logging
 import telebot
 
+from pymongo import MongoClient
+
 
 def main():
+    
     # Load your token and create an Updater for your Bot
     config = configparser.ConfigParser()
     config.read('config.ini')
@@ -22,11 +25,26 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(advanced, pattern='advanced'))
     updater.dispatcher.add_handler(CallbackQueryHandler(intermediate, pattern='intermediate'))
     updater.dispatcher.add_handler(CallbackQueryHandler(beginner, pattern='beginner'))
+    dispatcher.add_handler(CommandHandler("add", add))
 ##########################################################################################################      
     updater.dispatcher.add_error_handler(error)
     
     updater.start_polling()
     updater.idle()
+
+def add(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /add is issued."""
+    
+    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
+
+    try: 
+        db = client.add
+        logging.info(context.args[0])
+        msg = context.args[0]   # /add keyword <-- this should store the keyword
+        result = db.test.insert_one({'test': msg})
+        update.message.reply_text("added")
+    except (IndexError, ValueError):
+        update.message.reply_text('Usage: /add <keyword>')
 ##############################Workout Guide Function #####################################################
 def workout_command(bot, update):
     bot.message.reply_text(main_menu_message(),

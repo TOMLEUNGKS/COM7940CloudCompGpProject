@@ -70,7 +70,7 @@ def intermediate_message():
 -Leg lift  \n\
 -Burpee with push-up\n\
 Instructions:\n\
--Perfrom each move at maximum effort for 45 seconds and then rest for 15 seconds\n\
+-Perform each move at maximum effort for 45 seconds and then rest for 15 seconds\n\
 -Do 3 rounds, resting for 1 minute in between rounds.'
 def beginner_message():
     return 'Beginner Exercise:\n\

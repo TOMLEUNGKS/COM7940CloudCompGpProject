@@ -16,6 +16,8 @@ from pymongo import MongoClient
 import matplotlib.pyplot as plt
 
 ############################################### Main ##################################################
+############################################### Main ##################################################
+############################################### Main ##################################################
 
 def main():
     
@@ -32,8 +34,6 @@ def main():
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.INFO)
 
-    dispatcher.add_handler(CommandHandler("add", add))
-
 ############################## Handlers for workout guide function #######################################
     updater.dispatcher.add_handler(CommandHandler('workout', workout_command))
     updater.dispatcher.add_handler(CallbackQueryHandler(main_menu, pattern='main'))
@@ -42,34 +42,24 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(beginner, pattern='beginner'))
 ##########################################################################################################   
 
+
 ############################## Handlers for weight management function ###################################
     dispatcher.add_handler(CommandHandler("start", weight_start))
     dispatcher.add_handler(CommandHandler("weight", weight_store))
     dispatcher.add_handler(CommandHandler("height", height_store))
+    dispatcher.add_handler(CommandHandler("bmi", bmi_calculator))
 ##########################################################################################################   
    
     updater.dispatcher.add_error_handler(error)
-    
     updater.start_polling()
     updater.idle()
 
 ############################################### Main ##################################################
+############################################### Main ##################################################
+############################################### Main ##################################################
 
 
-def add(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /add is issued."""
-    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
-    try: 
-        db = client.add
-        logging.info(context.args[0])
-        msg = context.args[0]   # /add keyword <-- this should store the keyword
-        result = db.test.insert_one({'test': msg})
-        update.message.reply_text("added")
-    except (IndexError, ValueError):
-        update.message.reply_text('Usage: /add <keyword>')
-
-
-############################## weight management function ################################################
+######################################## weight management function ################################################
 
 def weight_start(update: Update, context: CallbackContext):
     """Send a welcome message."""
@@ -103,7 +93,38 @@ def height_store(update: Update, context: CallbackContext):
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /height <keyword>')
 
-############################## weight management function ################################################
+def bmi_calculator(update: Update, context: CallbackContext):
+    """Calculate the BMI value based on the stored height and weight"""
+    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
+    db = client.user
+    update.message.reply_text('BMIBMIBMI')
+
+    weight = db.weight.find({})   # /find the weight information 
+    weight_data = [w for w in weight] 
+    w1 = weight_data[len(weight_data) -1]
+    w1 = int(w1['weight'])
+
+    height = db.height.find({}) # /find the height information 
+    height_data = [h for h in height] 
+    h1 = height_data[len(height_data) -1]
+    h1 = int(h1['height'])
+
+    BMI = w1 / (h1/100)**2
+    BMI = round(BMI, 2)
+    if BMI <= 18.4:
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are underweight.")
+    elif BMI <= 24.9:
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are healthy.")
+    elif BMI <= 29.9:
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are over weight.")
+    elif BMI <= 34.9:
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely over weight.")
+    elif BMI <= 39.9:
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are obese.")
+    else:
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely obese.")
+
+######################################## weight management function ################################################
 
 
 ##############################Workout Guide Function #####################################################

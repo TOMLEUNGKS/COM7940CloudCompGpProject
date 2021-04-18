@@ -3,3 +3,7 @@ python-telegram-bot>=13.1
 configparser
 telebot
 dnspython
+matplotlib
+pandas
+pendulum
+pymongo

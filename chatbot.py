@@ -48,6 +48,7 @@ def main():
     dispatcher.add_handler(CommandHandler("weight", weight_store))
     dispatcher.add_handler(CommandHandler("height", height_store))
     dispatcher.add_handler(CommandHandler("bmi", bmi_calculator))
+    dispatcher.add_handler(CommandHandler("stats", weight_stats))
 ##########################################################################################################   
    
     updater.dispatcher.add_error_handler(error)
@@ -93,11 +94,25 @@ def height_store(update: Update, context: CallbackContext):
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /height <keyword>')
 
+def weight_stats(update: Update, context: CallbackContext):
+    """check the weight stats"""
+    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
+    db = client.user
+    weight = db.weight.find({})   # /find the weight information 
+    weight_data = [w for w in weight] 
+    data = []
+    for w in weight_data:
+        data.append(int(w['weight']))
+    min_weight = min(data)
+    max_weight = max(data)
+    means_weight = Average(data)
+    means_weight = round(means_weight, 2)
+    update.message.reply_text("Your weight mean is "+ str(means_weight) + "kg! The minimum was " + str(min_weight) + "kg and maximum was " + str(max_weight)+ "kg.")
+    
 def bmi_calculator(update: Update, context: CallbackContext):
     """Calculate the BMI value based on the stored height and weight"""
     client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
     db = client.user
-    update.message.reply_text('BMIBMIBMI')
 
     weight = db.weight.find({})   # /find the weight information 
     weight_data = [w for w in weight] 
@@ -123,6 +138,9 @@ def bmi_calculator(update: Update, context: CallbackContext):
         update.message.reply_text("You BMI is "+ str(BMI) + "! You are obese.")
     else:
         update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely obese.")
+
+def Average(lst):
+    return sum(lst) / len(lst)
 
 ######################################## weight management function ################################################
 

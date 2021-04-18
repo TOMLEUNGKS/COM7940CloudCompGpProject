@@ -16,7 +16,7 @@ from pymongo import MongoClient
 ############################################### Main ##################################################
 ############################################### Main ##################################################
 ############################################### Main ##################################################
-
+client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
 def main():
     
     matplotlib.use("agg")
@@ -69,12 +69,11 @@ def weight_start(update: Update, context: CallbackContext):
         "Afterward you can check you stats with /stats and BMI with /bmi"
     )
     update.message.reply_text(
-        "Also I can monitor your workout (/workout )for you "
+        "Also I can suggest some workouts (/workout )for you "
     )
 
 def weight_store(update: Update, context: CallbackContext):
     """Send a number (weight) when the command /weight is issued."""
-    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
 
     try: 
         db = client.user
@@ -87,7 +86,6 @@ def weight_store(update: Update, context: CallbackContext):
     
 def height_store(update: Update, context: CallbackContext):
     """Send a number (weight) when the command /weight is issued."""
-    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
 
     try: 
         db = client.user
@@ -100,7 +98,6 @@ def height_store(update: Update, context: CallbackContext):
 
 def weight_stats(update: Update, context: CallbackContext):
     """check the weight stats"""
-    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
     db = client.user
     weight = db.weight.find({})   # /find the weight information 
     weight_data = [w for w in weight] 
@@ -119,7 +116,6 @@ def weight_stats(update: Update, context: CallbackContext):
 
 def bmi_calculator(update: Update, context: CallbackContext):
     """Calculate the BMI value based on the stored height and weight"""
-    client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
     db = client.user
 
     weight = db.weight.find({})   # /find the weight information 
@@ -176,38 +172,38 @@ def main_menu_message():
     return 'Please select the desired difficulty for you full-body workout:'
 
 def advanced_message():
-    return 'Advanced Exercise:\n\
--Jumping Jacks\n\
--Squat to Curtsy Lunge\n\
--High Knees\n\
--Push-up to Double Shoulder Tap  \n\
--Plyo Lunge\n\
--Sit-up to Glute Bridge\n\
--Finisher: Broad Jump to Burpee\n\
-Instructions:\n\
--Do the first six exercises for 1 minute each.\n\
--Do 2 rounds, resting for 1 minute in between rounds.\n\
--Rest 1 minute, and then do the finisher exercise for 1 minute.'
+    db=client.workouts
+    workouts = db.advancedWorkout.find()
+    instructions = db.advancedInstructions.find()
+    work = []
+    ins = []
+    for workout in workouts:
+        work.append(workout["workout"])
+    for instruction in instructions:
+        ins.append(instruction["instruction"])
+    return ("\n".join(work + ins))
 def intermediate_message():
-    return 'Intermiediate Exercise:\n\
--Squat to overhead press\n\
--Push-up with renegade row\n\
--Glute bridge with skull-crusher\n\
--Leg lift  \n\
--Burpee with push-up\n\
-Instructions:\n\
--Perform each move at maximum effort for 45 seconds and then rest for 15 seconds\n\
--Do 3 rounds, resting for 1 minute in between rounds.'
+    db=client.workouts
+    workouts = db.intermediateWorkout.find()
+    instructions = db.intermediateInstructions.find()
+    work = []
+    ins = []
+    for workout in workouts:
+        work.append(workout["workout"])
+    for instruction in instructions:
+        ins.append(instruction["instruction"])
+    return ("\n".join(work + ins))
 def beginner_message():
-    return 'Beginner Exercise:\n\
--Squat Thrust\n\
--Plank Hip Dip\n\
--Lateral Lunge to Single-Leg Hop\n\
--Forearm Plank Reach Out  \n\
--Shoulder Taps\n\
-Instructions:\n\
--Perfrom each move at maximum effort for 30 seconds and then rest for 30 seconds\n\
--Do 3 rounds, resting for 2 minute in between rounds.'
+    db=client.workouts
+    workouts = db.beginnerWorkout.find()
+    instructions = db.beginnerInstructions.find()
+    work = []
+    ins = []
+    for workout in workouts:
+        work.append(workout["workout"])
+    for instruction in instructions:
+        ins.append(instruction["instruction"])
+    return ("\n".join(work + ins))
     
 def main_menu_keyboard():
   keyboard = [[InlineKeyboardButton('Advanced', callback_data='advanced')],

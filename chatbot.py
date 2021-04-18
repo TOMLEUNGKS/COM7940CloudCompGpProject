@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
-
+import telegram
 import configparser
 import logging
 import csv
@@ -12,8 +12,6 @@ import pandas as pd
 import pendulum
 from pandas.plotting import register_matplotlib_converters
 from pymongo import MongoClient
-
-import matplotlib.pyplot as plt
 
 ############################################### Main ##################################################
 ############################################### Main ##################################################
@@ -67,6 +65,12 @@ def weight_start(update: Update, context: CallbackContext):
     update.message.reply_text(
         "Hi! Just type in your current height (/height) in cm and weight (/weight) in Kg and I'll store it for you!"
     )
+    update.message.reply_text(
+        "Afterward you can check you stats with /stats and BMI with /bmi"
+    )
+    update.message.reply_text(
+        "Also I can monitor your workout (/workout )for you "
+    )
 
 def weight_store(update: Update, context: CallbackContext):
     """Send a number (weight) when the command /weight is issued."""
@@ -103,12 +107,16 @@ def weight_stats(update: Update, context: CallbackContext):
     data = []
     for w in weight_data:
         data.append(int(w['weight']))
+    w = data[len(weight_data) -1]
     min_weight = min(data)
     max_weight = max(data)
     means_weight = Average(data)
     means_weight = round(means_weight, 2)
+
+    update.message.reply_text("Your most recent weight is "+  str(w) )
     update.message.reply_text("Your weight mean is "+ str(means_weight) + "kg! The minimum was " + str(min_weight) + "kg and maximum was " + str(max_weight)+ "kg.")
-    
+
+
 def bmi_calculator(update: Update, context: CallbackContext):
     """Calculate the BMI value based on the stored height and weight"""
     client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
@@ -131,13 +139,13 @@ def bmi_calculator(update: Update, context: CallbackContext):
     elif BMI <= 24.9:
         update.message.reply_text("You BMI is "+ str(BMI) + "! You are healthy.")
     elif BMI <= 29.9:
-        update.message.reply_text("You BMI is "+ str(BMI) + "! You are over weight.")
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are over weight. let me recommend some /workout for you.")
     elif BMI <= 34.9:
-        update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely over weight.")
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely over weight. /workout will be good for your health.")
     elif BMI <= 39.9:
-        update.message.reply_text("You BMI is "+ str(BMI) + "! You are obese.")
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are obese. let me recommend some /workout for you, it is good for your health.")
     else:
-        update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely obese.")
+        update.message.reply_text("You BMI is "+ str(BMI) + "! You are severely obese. You definitely require some /workout.")
 
 def Average(lst):
     return sum(lst) / len(lst)

@@ -16,7 +16,11 @@ from pymongo import MongoClient
 ############################################### Main ##################################################
 ############################################### Main ##################################################
 ############################################### Main ##################################################
-client = MongoClient("mongodb+srv://comp7940group1:comp7940group1@cluster0.vyq4q.mongodb.net/Message-DB?retryWrites=true&w=majority")
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+client = MongoClient(config['MONGODB']['client_link'])
+
 def main():
     
     matplotlib.use("agg")

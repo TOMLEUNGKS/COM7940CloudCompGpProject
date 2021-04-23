@@ -12,7 +12,7 @@ jobs:
       uses: actions/checkout@master
 
     # Setup gcloud CLI
-    - uses: github-actions/setup-gcloud@master
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_email: ${{ secrets.GCP_EMAIL }}
         service_account_key: ${{ secrets.GCP_CREDENTIALS }}
@@ -26,7 +26,7 @@ jobs:
     # Build the Docker image
     - name: Build & Publish
       run: |
-        gcloud config set project ${{ secrets.PROJECT_ID }}
+        gcloud config set project ${{ secrets.GCP_PROJECT }}
         gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}
         gcloud config set run/region us-central1
       

@@ -26,7 +26,7 @@ jobs:
     # Build the Docker image
     - name: Build & Publish
       run: |
-        gcloud config set project PROJECT_ID
+        gcloud config set project ${{ secrets.PROJECT_ID }}
         gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}
         gcloud config set run/region us-central1
       

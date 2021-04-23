@@ -1,5 +1,5 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler, ConversationHandler
 import telegram
 import configparser
 import logging
@@ -12,6 +12,9 @@ import pandas as pd
 import pendulum
 from pandas.plotting import register_matplotlib_converters
 from pymongo import MongoClient
+
+#dependencies for Sleeping Quality Function
+from typing import Dict
 
 ############################################### Main ##################################################
 
@@ -40,8 +43,6 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(advanced, pattern='advanced'))
     updater.dispatcher.add_handler(CallbackQueryHandler(intermediate, pattern='intermediate'))
     updater.dispatcher.add_handler(CallbackQueryHandler(beginner, pattern='beginner'))
-##########################################################################################################   
-
 
 ############################## Handlers for weight management function ###################################
     dispatcher.add_handler(CommandHandler("start", weight_start))
@@ -49,11 +50,42 @@ def main():
     dispatcher.add_handler(CommandHandler("height", height_store))
     dispatcher.add_handler(CommandHandler("bmi", bmi_calculator))
     dispatcher.add_handler(CommandHandler("stats", weight_stats))
-##########################################################################################################   
+
+############################## Handlers for sleeping quality function ###################################
+    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('sleep', sleep)],
+        states={
+            CHOOSING: [
+                MessageHandler(
+                    Filters.regex('^(No. of hours of sleep|Time taken to fall asleep|Issues encountered)$'), regular_choice
+                ),
+                MessageHandler(Filters.regex('^Something else...$'), custom_choice),
+            ],
+            TYPING_CHOICE: [
+                MessageHandler(
+                    Filters.text & ~(Filters.command | Filters.regex('^Done$')), regular_choice
+                )
+            ],
+            TYPING_REPLY: [
+                MessageHandler(
+                    Filters.text & ~(Filters.command | Filters.regex('^Done$')),
+                    received_information,
+                )
+            ],
+        },
+        fallbacks=[MessageHandler(Filters.regex('^Done$'), done)],
+    )
+
+    dispatcher.add_handler(conv_handler)
+
+###########################################################################################################
     updater.dispatcher.add_error_handler(error)
     updater.start_polling()
     updater.idle()
 ############################################### Main ##################################################
+
+
 
 ######################################## weight management function ################################################
 
@@ -67,6 +99,10 @@ def weight_start(update: Update, context: CallbackContext):
     )
     update.message.reply_text(
         "Also I can suggest some workouts (/workout )for you "
+    )
+
+    update.message.reply_text(
+        "Or you may evaluate your sleeping quality by typing /sleep"
     )
 
 def weight_store(update: Update, context: CallbackContext):
@@ -208,6 +244,92 @@ def main_menu_keyboard():
               [InlineKeyboardButton('Beginner', callback_data='beginner')],]
   return InlineKeyboardMarkup(keyboard)
 ###########################################################################################################  
+
+##############################Sleeping Quality Function #####################################################
+
+CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
+
+reply_keyboard = [
+    ['No. of hours of sleep', 'Time taken to fall asleep'],
+    ['Issues encountered', 'Something else...'],
+    ['Done'],
+]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+
+def facts_to_str(user_data: Dict[str, str]) -> str:
+    facts = list()
+
+    for key, value in user_data.items():
+        facts.append(f'{key} - {value}')
+
+    return "\n".join(facts).join(['\n', '\n'])
+
+
+def sleep(update: Update, _: CallbackContext) -> int:
+    update.message.reply_text(
+        "Yay! Time to evaluate your sleeping quality. We will have an in-depth conversation. Let's crack on!",
+        reply_markup=markup,
+    )
+
+    return CHOOSING
+
+
+def regular_choice(update: Update, context: CallbackContext) -> int:
+    text = update.message.text
+    context.user_data['choice'] = text
+    update.message.reply_text(f'Your {text.lower()}? Yes, I would love to hear about that! Please provide your input below.')
+
+    return TYPING_REPLY
+
+
+def custom_choice(update: Update, _: CallbackContext) -> int:
+    update.message.reply_text(
+        'Alright, please send me the category first, for example "The need of taking medicine"'
+    )
+
+    return TYPING_CHOICE
+
+
+def received_information(update: Update, context: CallbackContext) -> int:
+    user_data = context.user_data
+    text = update.message.text
+    category = user_data['choice']
+    user_data[category] = text
+    del user_data['choice']
+
+    update.message.reply_text(
+        "Neat! Just so you know, this is what you already told me:"
+        f"{facts_to_str(user_data)} You can tell me more, or change your opinion"
+        " on something.",
+        reply_markup=markup,
+    )
+
+    return CHOOSING
+
+
+def done(update: Update, context: CallbackContext) -> int:
+    user_data = context.user_data
+    if 'choice' in user_data:
+        del user_data['choice']
+    update.message.reply_text(
+        f"I learned these facts about you: {facts_to_str(user_data)}")
+    update.message.reply_text(
+        "If your no. of hours of sleep is less than 6 hours,")
+    update.message.reply_text(
+        "or it takes more than 1 hour to fall asleep,")
+    update.message.reply_text(
+        "or you encounter other issues in connection with sleeping,")
+    update.message.reply_text(
+        "please consult your family docter or your can learn more here:")
+    update.message.reply_text(
+        "https://www.sleep.org/sleep-quantity-different-sleep-quality/")
+    user_data.clear()
+    return ConversationHandler.END
+
+##############################Sleeping Quality Function #####################################################
+
+
 def error(update, context):
     print(f'Update {update} caused error {context.error}')
 

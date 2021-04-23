@@ -1,7 +1,7 @@
 FROM python
-COPY requirements.txt /tmp/requirements.txt
-WORKDIR /tmp
-RUN pip install -r /tmp/requirements.txt &&\
-    git clone https://github.com/TOMLEUNGKS/COM7940CloudCompGpProject.git
+COPY requirements.txt /requirements.txt
+COPY chatbot.py  /chatbot.py
+RUN pip install pip update
+RUN pip install -r /tmp/requirements.txt 
+CMD python chatbot.py
 
-CMD cd COM7940CloudCompGpProject && git pull origin main && python chatbot.py

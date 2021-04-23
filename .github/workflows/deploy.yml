@@ -33,4 +33,4 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        gcloud run deploy ${{ secrets.GCP_APPLICATION }} --platform=gke --allow-unauthenticated --memory=512M --image=gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}
+        gcloud run deploy ${{ secrets.GCP_APPLICATION }} --platform=managed --allow-unauthenticated --memory=512M --image=gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}

@@ -33,4 +33,4 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        gcloud beta run deploy cloudcomp_tg_bot --image=gcr.io/smiling-algebra-311616/cloudcomp_tg_bot --platform=gke --cluster=my-gke-cluster --cluster-location=asia-southeast1-a
+        gcloud beta run deploy cloudcomp_tg_bot --quiet --image=gcr.io/smiling-algebra-311616/cloudcomp_tg_bot --platform=gke --cluster=my-gke-cluster --cluster-location=asia-southeast1-a

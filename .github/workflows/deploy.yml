@@ -34,7 +34,6 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        gcloud app create --region asia-south1
         gcloud app deploy app.yaml \
         --project smiling-algebra-311616 \
 

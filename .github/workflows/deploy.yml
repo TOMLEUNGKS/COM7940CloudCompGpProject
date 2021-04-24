@@ -36,5 +36,6 @@ jobs:
       run: |
         gcloud app create
         gcloud app deploy app.yaml \
-        --project smiling-algebra-311616
+        --project smiling-algebra-311616 \
+        --region asia-southeast1-a
 

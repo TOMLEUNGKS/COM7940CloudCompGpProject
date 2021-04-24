@@ -34,6 +34,7 @@ jobs:
     - name: Deploy
       run: |
         gcloud run deploy cloudcomp_tg_bot --image gcr.io/smiling-algebra-311616/cloudcomp_tg_bot\
-        --platform managed \
+        --platform-gke \
+        --cluster my-gke-cluster \
         --allow-unauthenticated \
         --memory 512M

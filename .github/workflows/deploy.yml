@@ -33,7 +33,7 @@ jobs:
     # Push the Docker image to Google Container Registry
     - name: Publish
       run: |-
-        docker push "gcr.io/smiling-algebra-311616/cloudcomp_tg_bot"
+        docker push gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}
 
     # Set up kustomize
     - name: Set up Kustomize
@@ -44,7 +44,7 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |-
-        ./kustomize edit set image gcr.io/smiling-algebra-311616/cloudcomp_tg_bot:TAG=gcr.io/smiling-algebra-311616/cloudcomp_tg_bot
+        ./kustomize edit set image gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}:TAG=gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }}
         ./kustomize build . | kubectl apply -f -
         kubectl rollout status deployment/my-gke-cluster
         kubectl get services -o wide

@@ -34,5 +34,5 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        gcloud beta run deploy ${{ secrets.GCP_APPLICATION }} --image=gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }} --platform=gke --cluster=my-gke-cluster --cluster-location=asia-southeast1-a
+        gcloud --quiet beta run deploy ${{ secrets.GCP_APPLICATION }} --image=gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }} --platform=gke --cluster=my-gke-cluster --cluster-location=asia-southeast1-a
 

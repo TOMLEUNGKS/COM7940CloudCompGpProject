@@ -33,7 +33,7 @@ jobs:
     # Deploy the Docker image to the GKE cluster
     - name: Deploy
       run: |
-        gcloud run deploy ${{ secrets.GCP_APPLICATION }} --image gcr.io/${{ secrets.GCP_PROJECT }}/${{ secrets.GCP_APPLICATION }} \
+        gcloud run deploy cloudcomp_tg_bot --image gcr.io/smiling-algebra-311616/cloudcomp_tg_bot\
         --platform managed \
         --allow-unauthenticated \
         --memory 512M
